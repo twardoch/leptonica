@@ -132,11 +132,16 @@
  *           \end{document}
  *         You can then generate a dvi file <latexname>.dvi using
  *           latex <latexname>.tex
- *         and a PostScript file <psname>.ps from that using
+ *         a PostScript file <psname>.ps from that using
  *           dvips -o <psname>.ps <latexname>.dvi
+ *         and pdf file <psname>.pdf from that using Ghostscript's ps2pdf:
+ *           ps2pdf <psname>.ps <pdfname>.pdf
  *
- *     N.B. To generate plots, it is necessary to have gnuplot installed on
- *          your Unix system, or wgnuplot on Windows.
+ *     N.B. To generate plots:
+ *          (1) It is necessary to have gnuplot installed on your Unix system,
+ *              or wgnuplot on Windows.
+ *          (2) You must enable debug operations:
+ *                setLeptDebugOK(1);
  * </pre>
  */
 
@@ -576,8 +581,9 @@ FILE    *fp;
         /* Write command data to file */
     cmdstr = sarrayToString(gplot->cmddata, 1);
     if ((fp = fopenWriteStream(gplot->cmdname, "w")) == NULL) {
+        L_ERROR("stream not opened for command: %s\n", __func__, cmdstr);
         LEPT_FREE(cmdstr);
-        return ERROR_INT_1("cmd stream not opened", cmdstr, __func__, 1);
+        return 1;
     }
     fwrite(cmdstr, 1, strlen(cmdstr), fp);
     fclose(fp);
@@ -756,7 +762,7 @@ gplotSimplePix1(NUMA        *na,
                 const char  *title)
 {
 char            buf[64];
-static l_int32  index;
+static l_atomic index;
 GPLOT          *gplot;
 PIX            *pix;
 
@@ -798,7 +804,7 @@ gplotSimplePix2(NUMA        *na1,
                 const char  *title)
 {
 char            buf[64];
-static l_int32  index;
+static l_atomic index;
 GPLOT          *gplot;
 PIX            *pix;
 
@@ -839,7 +845,7 @@ gplotSimplePixN(NUMAA       *naa,
                 const char  *title)
 {
 char            buf[64];
-static l_int32  index;
+static l_atomic index;
 GPLOT          *gplot;
 PIX            *pix;
 
@@ -1244,7 +1250,7 @@ GPLOT   *gplot;
     LEPT_FREE(ylabel);
     if (!gplot) {
         fclose(fp);
-        return (GPLOT *)ERROR_PTR("gplot not made", __func__, NULL);
+        return (GPLOT *)ERROR_PTR_1("gplot not made", filename, __func__, NULL);
     }
     sarrayDestroy(&gplot->cmddata);
     sarrayDestroy(&gplot->datanames);

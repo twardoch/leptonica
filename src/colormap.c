@@ -369,12 +369,13 @@ l_int32  d, depth, nalloc, maxindex, maxcolors;
 
         /* Where the colormap or the pix may have been corrupted, and
          * in particular when reading or writing image files, it should
-         * be verified that the image pixel values do not exceed the
-         * max indexing into the colormap array. */
+         * be verified that the largest colormap index value in the image
+         * is less than the number of entries in the colormap array.  */
     if (pix) {
         pixGetMaxColorIndex(pix, &maxindex);
         if (maxindex >= cmap->n) {
-            L_ERROR("(max index = %d) >= (num colors = %d)\n", __func__,
+            L_ERROR("(max index in image = %d) >= "
+                    "(number entries in colormap = %d)\n", __func__,
                     maxindex, cmap->n);
             return 1;
         }
@@ -1657,7 +1658,7 @@ PIXCMAP   *cmapd;
     sum = rwt + gwt + bwt;
     if (sum == 0.0) {
         L_WARNING("all weights zero; setting equal to 1/3\n", __func__);
-        rwt = gwt = bwt = 0.33333;
+        rwt = gwt = bwt = 0.33333f;
         sum = 1.0;
     }
     if (L_ABS(sum - 1.0) > 0.0001) {  /* maintain ratios with sum == 1.0 */
@@ -1947,7 +1948,7 @@ FILE    *fp;
     ret = pixcmapWriteStream(fp, cmap);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32
@@ -1986,7 +1987,7 @@ pixcmapToArrays(const PIXCMAP  *cmap,
                 l_int32       **pbmap,
                 l_int32       **pamap)
 {
-l_int32    *rmap, *gmap, *bmap, *amap;
+l_int32    *rmap, *gmap, *bmap, *amap = NULL;
 l_int32     i, ncolors;
 RGBA_QUAD  *cta;
 

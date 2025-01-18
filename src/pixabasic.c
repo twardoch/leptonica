@@ -443,7 +443,7 @@ pixaCopy(PIXA    *pixa,
          l_int32  copyflag)
 {
 l_int32  i, nb;
-BOX     *boxc;
+BOX     *boxc = NULL;
 PIX     *pixc;
 PIXA    *pixac;
 
@@ -1803,7 +1803,7 @@ pixaaCreateFromPixa(PIXA    *pixa,
 {
 l_int32  count, i, j, npixa;
 PIX     *pix;
-PIXA    *pixat;
+PIXA    *pixat = NULL;
 PIXAA   *paa;
 
     if (!pixa)
@@ -2744,7 +2744,7 @@ FILE    *fp;
     ret = pixaWriteStream(fp, pixa);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32
@@ -3114,7 +3114,7 @@ FILE    *fp;
     ret = pixaaWriteStream(fp, paa);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32

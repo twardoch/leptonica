@@ -198,9 +198,9 @@ static const l_int32    MaxExamplesInClass = 256;
     /* Default recog parameters that can be changed */
 static const l_int32    DefaultCharsetType = L_ARABIC_NUMERALS;
 static const l_int32    DefaultMinNopad = 1;
-static const l_float32  DefaultMaxWHRatio = 3.0;  /* max allowed w/h
+static const l_float32  DefaultMaxWHRatio = 3.0f;  /* max allowed w/h
                                     ratio for a component to be split  */
-static const l_float32  DefaultMaxHTRatio = 2.6;  /* max allowed ratio of
+static const l_float32  DefaultMaxHTRatio = 2.6f;  /* max allowed ratio of
                                max/min unscaled averaged template heights  */
 static const l_int32    DefaultThreshold = 150;  /* for binarization */
 static const l_int32    DefaultMaxYShift = 1;  /* for identification */
@@ -602,9 +602,8 @@ recogGetCharsetSize(l_int32  type)
         return 26;
     default:
         L_ERROR("invalid charset_type %d\n", __func__, type);
-        return 0;
     }
-    return 0;  /* shouldn't happen */
+    return 0;
 }
 
 
@@ -877,7 +876,7 @@ SARRAY   *sa_text;
                              maxyshift)) == NULL)
         return (L_RECOG *)ERROR_PTR("recog not made", __func__, NULL);
 
-    if (fscanf(fp, "\nLabels for character set:\n") != 0) {
+    if (fscanf(fp, "\nLabels for character set:\n") == -1) {
         recogDestroy(&recog);
         return (L_RECOG *)ERROR_PTR("label intro not read", __func__, NULL);
     }
@@ -894,7 +893,7 @@ SARRAY   *sa_text;
     }
     recog->sa_text = sa_text;
 
-    if (fscanf(fp, "\nPixaa of all samples in the training set:\n") != 0) {
+    if (fscanf(fp, "\nPixaa of all samples in the training set:\n") == -1) {
         recogDestroy(&recog);
         return (L_RECOG *)ERROR_PTR("pixaa intro not read", __func__, NULL);
     }
@@ -1054,7 +1053,7 @@ FILE    *fp;
     ret = recogWriteStream(fp, recog);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32

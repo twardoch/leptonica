@@ -143,7 +143,8 @@ LEPT_DLL const char *ImageFileFormatExtensions[] =
           "default",
           ""};
 
-    /* Local map of image file name extension to output format */
+    /* Local map of image file name extension to output format.
+     * Note that the extension string always includes a '.'  */
 struct ExtensionMap
 {
     char     extension[16];
@@ -158,9 +159,12 @@ static const struct ExtensionMap extension_map[] =
                               { ".tif",      IFF_TIFF      },
                               { ".tiff",     IFF_TIFF      },
                               { ".tiffg4",   IFF_TIFF_G4   },
+                              { ".pbm",      IFF_PNM       },
+                              { ".pgm",      IFF_PNM       },
                               { ".pnm",      IFF_PNM       },
                               { ".gif",      IFF_GIF       },
                               { ".jp2",      IFF_JP2       },
+                              { ".j2k",      IFF_JP2       },
                               { ".ps",       IFF_PS        },
                               { ".pdf",      IFF_LPDF      },
                               { ".webp",     IFF_WEBP      } };
@@ -437,7 +441,7 @@ pixWriteStream(FILE    *fp,
         return pixWriteStreamGif(fp, pix);
 
     case IFF_JP2:
-        return pixWriteStreamJp2k(fp, pix, 34, 4, L_JP2_CODEC, 0, 0);
+        return pixWriteStreamJp2k(fp, pix, 34, 0, L_JP2_CODEC, 0, 0);
 
     case IFF_WEBP:
         return pixWriteStreamWebP(fp, pix, 80, 0);
@@ -924,7 +928,7 @@ pixDisplayWithTitle(PIX         *pixs,
 {
 char           *tempname;
 char            buffer[Bufsize];
-static l_int32  index = 0;  /* caution: not .so or thread safe */
+static l_atomic index = 0;  /* caution: not .so safe */
 l_int32         w, h, d, spp, maxheight, opaque, threeviews;
 l_float32       ratw, rath, ratmin;
 PIX            *pix0, *pix1, *pix2;

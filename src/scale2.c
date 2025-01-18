@@ -216,9 +216,9 @@ PIX       *pixt, *pixd;
         return (PIX *)ERROR_PTR("pixs not defined", __func__, NULL);
     if (pixGetDepth(pixs) != 1)
         return (PIX *)ERROR_PTR("pixs not 1 bpp", __func__, NULL);
-    if (scalefactor <= 0.0)
+    if (scalefactor <= 0.0f)
         return (PIX *)ERROR_PTR("scalefactor <= 0.0", __func__, NULL);
-    if (scalefactor >= 1.0)
+    if (scalefactor >= 1.0f)
         return (PIX *)ERROR_PTR("scalefactor >= 1.0", __func__, NULL);
     pixGetDimensions(pixs, &w, &h, NULL);
     minsrc = L_MIN(w, h);
@@ -226,58 +226,58 @@ PIX       *pixt, *pixd;
     if (mindest < 2)
         return (PIX *)ERROR_PTR("scalefactor too small", __func__, NULL);
 
-    if (scalefactor > 0.5) {   /* see note (5) */
-        mag = 2.0 * scalefactor;  /* will be < 2.0 */
+    if (scalefactor > 0.5f) {   /* see note (5) */
+        mag = 2.0f * scalefactor;  /* will be < 2.0 */
 /*        lept_stderr("2x with mag %7.3f\n", mag);  */
         if ((pixt = pixScaleBinary(pixs, mag, mag)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray2(pixt);
-    } else if (scalefactor == 0.5) {
+    } else if (scalefactor == 0.5f) {
         return pixd = pixScaleToGray2(pixs);
-    } else if (scalefactor > 0.33333) {   /* see note (5) */
-        mag = 3.0 * scalefactor;   /* will be < 1.5 */
+    } else if (scalefactor > 0.33333f) {   /* see note (5) */
+        mag = 3.0f * scalefactor;   /* will be < 1.5 */
 /*        lept_stderr("3x with mag %7.3f\n", mag);  */
         if ((pixt = pixScaleBinary(pixs, mag, mag)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray3(pixt);
-    } else if (scalefactor > 0.25) {  /* see note (5) */
-        mag = 4.0 * scalefactor;   /* will be < 1.3333 */
+    } else if (scalefactor > 0.25f) {  /* see note (5) */
+        mag = 4.0f * scalefactor;   /* will be < 1.3333 */
 /*        lept_stderr("4x with mag %7.3f\n", mag);  */
         if ((pixt = pixScaleBinary(pixs, mag, mag)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray4(pixt);
-    } else if (scalefactor == 0.25) {
+    } else if (scalefactor == 0.25f) {
         return pixd = pixScaleToGray4(pixs);
-    } else if (scalefactor > 0.16667) {  /* see note (5) */
-        mag = 6.0 * scalefactor;   /* will be < 1.5 */
+    } else if (scalefactor > 0.16667f) {  /* see note (5) */
+        mag = 6.0f * scalefactor;   /* will be < 1.5 */
 /*        lept_stderr("6x with mag %7.3f\n", mag); */
         if ((pixt = pixScaleBinary(pixs, mag, mag)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray6(pixt);
-    } else if (scalefactor == 0.16667) {
+    } else if (scalefactor == 0.16667f) {
         return pixd = pixScaleToGray6(pixs);
-    } else if (scalefactor > 0.125) {  /* see note (5) */
-        mag = 8.0 * scalefactor;   /*  will be < 1.3333  */
+    } else if (scalefactor > 0.125f) {  /* see note (5) */
+        mag = 8.0f * scalefactor;   /*  will be < 1.3333  */
 /*        lept_stderr("8x with mag %7.3f\n", mag);  */
         if ((pixt = pixScaleBinary(pixs, mag, mag)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray8(pixt);
-    } else if (scalefactor == 0.125) {
+    } else if (scalefactor == 0.125f) {
         return pixd = pixScaleToGray8(pixs);
-    } else if (scalefactor > 0.0625) {  /* see note (6) */
-        red = 8.0 * scalefactor;   /* will be > 0.5 */
+    } else if (scalefactor > 0.0625f) {  /* see note (6) */
+        red = 8.0f * scalefactor;   /* will be > 0.5 */
 /*        lept_stderr("8x with red %7.3f\n", red);  */
         if ((pixt = pixScaleBinary(pixs, red, red)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray8(pixt);
-    } else if (scalefactor == 0.0625) {
+    } else if (scalefactor == 0.0625f) {
         return pixd = pixScaleToGray16(pixs);
     } else {  /* see note (7) */
-        red = 16.0 * scalefactor;  /* will be <= 1.0 */
+        red = 16.0f * scalefactor;  /* will be <= 1.0 */
 /*        lept_stderr("16x with red %7.3f\n", red);  */
         if ((pixt = pixScaleToGray16(pixs)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
-        if (red < 0.7)
+        if (red < 0.7f)
             pixd = pixScaleSmooth(pixt, red, red);  /* see note (3) */
         else
             pixd = pixScaleGrayLI(pixt, red, red);  /* see note (2) */
@@ -325,41 +325,41 @@ PIX       *pixt, *pixd;
         return (PIX *)ERROR_PTR("pixs not defined", __func__, NULL);
     if (pixGetDepth(pixs) != 1)
         return (PIX *)ERROR_PTR("pixs not 1 bpp", __func__, NULL);
-    if (scalefactor <= 0.0)
+    if (scalefactor <= 0.0f)
         return (PIX *)ERROR_PTR("scalefactor <= 0.0", __func__, NULL);
-    if (scalefactor >= 1.0)
+    if (scalefactor >= 1.0f)
         return (PIX *)ERROR_PTR("scalefactor >= 1.0", __func__, NULL);
     pixGetDimensions(pixs, &w, &h, NULL);
     minsrc = L_MIN(w, h);
     mindest = (l_int32)((l_float32)minsrc * scalefactor);
     if (mindest < 2)
         return (PIX *)ERROR_PTR("scalefactor too small", __func__, NULL);
-    eps = 0.0001;
+    eps = 0.0001f;
 
         /* Handle the special cases */
-    if (scalefactor > 0.5 - eps && scalefactor < 0.5 + eps)
+    if (scalefactor > 0.5f - eps && scalefactor < 0.5f + eps)
         return pixScaleToGray2(pixs);
-    else if (scalefactor > 0.33333 - eps && scalefactor < 0.33333 + eps)
+    else if (scalefactor > 0.33333f - eps && scalefactor < 0.33333f + eps)
         return pixScaleToGray3(pixs);
-    else if (scalefactor > 0.25 - eps && scalefactor < 0.25 + eps)
+    else if (scalefactor > 0.25f - eps && scalefactor < 0.25f + eps)
         return pixScaleToGray4(pixs);
-    else if (scalefactor > 0.16666 - eps && scalefactor < 0.16666 + eps)
+    else if (scalefactor > 0.16666f - eps && scalefactor < 0.16666f + eps)
         return pixScaleToGray6(pixs);
-    else if (scalefactor > 0.125 - eps && scalefactor < 0.125 + eps)
+    else if (scalefactor > 0.125f - eps && scalefactor < 0.125f + eps)
         return pixScaleToGray8(pixs);
-    else if (scalefactor > 0.0625 - eps && scalefactor < 0.0625 + eps)
+    else if (scalefactor > 0.0625f - eps && scalefactor < 0.0625f + eps)
         return pixScaleToGray16(pixs);
 
-    if (scalefactor > 0.0625) {  /* scale binary first */
-        factor = 2.0 * scalefactor;
+    if (scalefactor > 0.0625f) {  /* scale binary first */
+        factor = 2.0f * scalefactor;
         if ((pixt = pixScaleBinary(pixs, factor, factor)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
         pixd = pixScaleToGray2(pixt);
     } else {  /* scalefactor < 0.0625; scale-to-gray first */
-        factor = 16.0 * scalefactor;  /* will be < 1.0 */
+        factor = 16.0f * scalefactor;  /* will be < 1.0 */
         if ((pixt = pixScaleToGray16(pixs)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
-        if (factor < 0.7)
+        if (factor < 0.7f)
             pixd = pixScaleSmooth(pixt, factor, factor);
         else
             pixd = pixScaleGrayLI(pixt, factor, factor);
@@ -463,7 +463,7 @@ PIX       *pixd;
         return (PIX *)ERROR_PTR("pixd not made", __func__, NULL);
     pixCopyInputFormat(pixd, pixs);
     pixCopyResolution(pixd, pixs);
-    pixScaleResolution(pixd, 0.33333, 0.33333);
+    pixScaleResolution(pixd, 0.33333f, 0.33333f);
     datas = pixGetData(pixs);
     datad = pixGetData(pixd);
     wpls = pixGetWpl(pixs);
@@ -567,7 +567,7 @@ PIX       *pixd;
         return (PIX *)ERROR_PTR("pixd not made", __func__, NULL);
     pixCopyInputFormat(pixd, pixs);
     pixCopyResolution(pixd, pixs);
-    pixScaleResolution(pixd, 0.16667, 0.16667);
+    pixScaleResolution(pixd, 0.16667f, 0.16667f);
     datas = pixGetData(pixs);
     datad = pixGetData(pixd);
     wpls = pixGetWpl(pixs);
@@ -719,9 +719,9 @@ PIX       *pixs1, *pixs2, *pixt, *pixd;
         return (PIX *)ERROR_PTR("pixs not defined", __func__, NULL);
     if (pixGetDepth(pixs) != 1)
         return (PIX *)ERROR_PTR("pixs not 1 bpp", __func__, NULL);
-    if (scalefactor <= 0.0)
+    if (scalefactor <= 0.0f)
         return (PIX *)ERROR_PTR("scalefactor <= 0.0", __func__, NULL);
-    if (scalefactor >= 1.0)
+    if (scalefactor >= 1.0f)
         return (PIX *)ERROR_PTR("scalefactor >= 1.0", __func__, NULL);
     pixGetDimensions(pixs, &w, &h, NULL);
     minsrc = L_MIN(w, h);
@@ -729,35 +729,35 @@ PIX       *pixs1, *pixs2, *pixt, *pixd;
     if (mindest < 2)
         return (PIX *)ERROR_PTR("scalefactor too small", __func__, NULL);
 
-    if (scalefactor > 0.5) {
+    if (scalefactor > 0.5f) {
         pixs1 = pixConvert1To8(NULL, pixs, 255, 0);
         pixs2 = pixScaleToGray2(pixs);
         red = scalefactor;
-    } else if (scalefactor == 0.5) {
+    } else if (scalefactor == 0.5f) {
         return pixScaleToGray2(pixs);
-    } else if (scalefactor > 0.25) {
+    } else if (scalefactor > 0.25f) {
         pixs1 = pixScaleToGray2(pixs);
         pixs2 = pixScaleToGray4(pixs);
-        red = 2. * scalefactor;
-    } else if (scalefactor == 0.25) {
+        red = 2.f * scalefactor;
+    } else if (scalefactor == 0.25f) {
         return pixScaleToGray4(pixs);
-    } else if (scalefactor > 0.125) {
+    } else if (scalefactor > 0.125f) {
         pixs1 = pixScaleToGray4(pixs);
         pixs2 = pixScaleToGray8(pixs);
-        red = 4. * scalefactor;
-    } else if (scalefactor == 0.125) {
+        red = 4.f * scalefactor;
+    } else if (scalefactor == 0.125f) {
         return pixScaleToGray8(pixs);
-    } else if (scalefactor > 0.0625) {
+    } else if (scalefactor > 0.0625f) {
         pixs1 = pixScaleToGray8(pixs);
         pixs2 = pixScaleToGray16(pixs);
-        red = 8. * scalefactor;
-    } else if (scalefactor == 0.0625) {
+        red = 8.f * scalefactor;
+    } else if (scalefactor == 0.0625f) {
         return pixScaleToGray16(pixs);
     } else {  /* end of the pyramid; just do it */
-        red = 16.0 * scalefactor;  /* will be <= 1.0 */
+        red = 16.0f * scalefactor;  /* will be <= 1.0 */
         if ((pixt = pixScaleToGray16(pixs)) == NULL)
             return (PIX *)ERROR_PTR("pixt not made", __func__, NULL);
-        if (red < 0.7)
+        if (red < 0.7f)
             pixd = pixScaleSmooth(pixt, red, red);
         else
             pixd = pixScaleGrayLI(pixt, red, red);
@@ -810,7 +810,7 @@ PIX       *pixd;
                                 __func__, NULL);
     pixGetDimensions(pixs1, &ws1, &hs1, NULL);
     pixGetDimensions(pixs2, &ws2, &hs2, NULL);
-    if (scale > 1.0 || scale < 0.5)
+    if (scale > 1.0f || scale < 0.5f)
         return (PIX *)ERROR_PTR("scale not in [0.5, 1.0]", __func__, NULL);
     if (ws1 < 2 * ws2)
         return (PIX *)ERROR_PTR("invalid width ratio", __func__, NULL);
@@ -823,8 +823,8 @@ PIX       *pixd;
     wpls1 = pixGetWpl(pixs1);
     datas2 = pixGetData(pixs2);
     wpls2 = pixGetWpl(pixs2);
-    wd = (l_int32)(2. * scale * pixGetWidth(pixs2));
-    hd = (l_int32)(2. * scale * pixGetHeight(pixs2));
+    wd = (l_int32)(2 * scale * pixGetWidth(pixs2));
+    hd = (l_int32)(2 * scale * pixGetHeight(pixs2));
     if ((pixd = pixCreate(wd, hd, 8)) == NULL)
         return (PIX *)ERROR_PTR("pixd not made", __func__, NULL);
     pixCopyInputFormat(pixd, pixs1);
@@ -1345,7 +1345,7 @@ PIX  *pix1, *pix2;
     if (pixGetDepth(pixd) != 32)
         return ERROR_INT("pixd not 32 bpp", __func__, 1);
 
-    if (scalex == 1.0 && scaley == 1.0) {
+    if (scalex == 1.0f && scaley == 1.0f) {
         pixCopyRGBComponent(pixd, pixs, L_ALPHA_CHANNEL);
         return 0;
     }
@@ -1422,18 +1422,18 @@ PIX     *pixd, *pix32, *pixg2, *pixgs;
     pixGetDimensions(pixs, &ws, &hs, &d);
     if (d != 32 && !pixGetColormap(pixs))
         return (PIX *)ERROR_PTR("pixs not cmapped or 32 bpp", __func__, NULL);
-    if (scalex <= 0.0 || scaley <= 0.0)
+    if (scalex <= 0.0f || scaley <= 0.0f)
         return (PIX *)ERROR_PTR("scale factor <= 0.0", __func__, NULL);
     if (pixg && pixGetDepth(pixg) != 8) {
         L_WARNING("pixg not 8 bpp; using 'fract' transparent alpha\n",
                   __func__);
         pixg = NULL;
     }
-    if (!pixg && (fract < 0.0 || fract > 1.0)) {
+    if (!pixg && (fract < 0.0f || fract > 1.0f)) {
         L_WARNING("invalid fract; using fully opaque\n", __func__);
         fract = 1.0;
     }
-    if (!pixg && fract == 0.0)
+    if (!pixg && fract == 0.0f)
         L_WARNING("transparent alpha; image will not be blended\n", __func__);
 
         /* Make sure input to scaling is 32 bpp rgb, and scale it */
@@ -1450,20 +1450,20 @@ PIX     *pixd, *pix32, *pixg2, *pixgs;
         /* Set up alpha layer with a fading border and scale it */
     if (!pixg) {
         pixg2 = pixCreate(ws, hs, 8);
-        if (fract == 1.0)
+        if (fract == 1.0f)
             pixSetAll(pixg2);
-        else if (fract > 0.0)
-            pixSetAllArbitrary(pixg2, (l_int32)(255.0 * fract));
+        else if (fract > 0.0f)
+            pixSetAllArbitrary(pixg2, (l_int32)(255 * fract));
     } else {
         pixg2 = pixResizeToMatch(pixg, NULL, ws, hs);
     }
     if (ws > 10 && hs > 10) {  /* see note 4 */
         pixSetBorderRingVal(pixg2, 1,
-                            (l_int32)(255.0 * fract * AlphaMaskBorderVals[0]));
+                            (l_int32)(255 * fract * AlphaMaskBorderVals[0]));
         pixSetBorderRingVal(pixg2, 2,
-                            (l_int32)(255.0 * fract * AlphaMaskBorderVals[1]));
+                            (l_int32)(255 * fract * AlphaMaskBorderVals[1]));
     }
-    pixgs = pixScaleGeneral(pixg2, scalex, scaley, 0.0, 0);
+    pixgs = pixScaleGeneral(pixg2, scalex, scaley, 0.0f, 0);
 
         /* Combine into a 4 spp result */
     pixSetRGBComponent(pixd, pixgs, L_ALPHA_CHANNEL);
@@ -2251,7 +2251,7 @@ l_float32  ratio, w1, w2;
         LEPT_FREE(srow);
         return ERROR_INT("scol not made", __func__, 1);
     }
-    ratio = 1. / (2. * red);  /* 0.5 for red = 1, 1 for red = 0.5 */
+    ratio = 1.f / (2.f * red);  /* 0.5 for red = 1, 1 for red = 0.5 */
     for (i = 0; i < hd; i++)
         srow[i] = (l_int32)(ratio * i);
     for (j = 0; j < wd; j++)
@@ -2260,8 +2260,8 @@ l_float32  ratio, w1, w2;
         /* Get weights for linear interpolation: these are the
          * 'distances' of the dest image plane from the two
          * src image planes. */
-    w1 = 2. * red - 1.;   /* w1 --> 1 as red --> 1 */
-    w2 = 1. - w1;
+    w1 = 2.f * red - 1.f;   /* w1 --> 1 as red --> 1 */
+    w2 = 1.f - w1;
 
         /* For each dest pixel, compute linear interpolation */
     for (i = 0; i < hd; i++) {

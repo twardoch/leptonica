@@ -387,7 +387,7 @@ PIXCMAP  *cmap, *cmapg;
     pixDestroy(&pix3);
     pixDestroy(&pix4);
 
-        /* Demonstrate read of cmap+alpha png, and I/O of rgba pnm, bmp, webp */
+        /* Demonstrate read of cmap+alpha png; I/O of rgba pnm, bmp, webp */
     pix1 = pixRead("elephant-cmap-alpha.png");  /* has colormap */
     pixDisplay(pix1, 1300, 800);
     pixWrite("/tmp/lept/misc/e.pnm", pix1, IFF_PNM);

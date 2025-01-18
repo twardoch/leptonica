@@ -157,11 +157,25 @@
  *  A high-level interface, pixOrientCorrect() combines the detection
  *  of the orientation with the rotation decision and the rotation itself.
  *
+ *  The structuring elements used for text orientation detection require text
+ *  with ascenders and descenders.  They have been designed to work best
+ *  with normal sized text (about 10 pt font), scanned with a resolution
+ *  between 150 and 300 ppi.
+ *
  *  For pedagogical reasons, we have included a dwa implementation of
  *  this functionality, in flipdetectdwa.c.notused.  It shows by example
  *  how to make a dwa implementation of an application that uses binary
  *  morphological operations.  It is faster than the rasterop implementation,
  *  but not by a large amount.
+ *
+ *  The generation of flipdetectdwa.c.notused was achieved as follows:
+ *  (1) The program flipselgen.c.notused generates the DWA code, in two C files
+ *  (2) The low-level DWA code in those two files was put into a single
+ *      file, fliphmtgen.c.notused, for clarity.  We didn't want the two
+ *      files (fmorphgen.3.c and fmorphgenlow.3.c) sitting around and
+ *      possibly causing confusion.
+ *  (3) This low-level code was directly incorporated into flipdetectdwa.c,
+ *      where it substitutes for the basic rasterop code in flipdetect.c.
  *
  *  Finally, use can be made of programs such as exiftool and convert to
  *  read exif camera orientation data in jpeg files and conditionally rotate.
@@ -250,7 +264,7 @@ static void pixDebugFlipDetect(const char *filename, PIX *pixs,
 /*!
  * \brief   pixOrientCorrect()
  *
- * \param[in]    pixs        1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[in]    pixs        1 bpp, deskewed, Roman text, 150 - 300 ppi
  * \param[in]    minupconf   minimum value for which a decision can be made
  * \param[in]    minratio    minimum conf ratio required for a decision
  * \param[out]   pupconf     [optional] ; use NULL to skip
@@ -268,6 +282,7 @@ static void pixDebugFlipDetect(const char *filename, PIX *pixs,
  *          Use 0.0 for default values for %minupconf and %minratio
  *      (4) Optional output of intermediate confidence results and
  *          the rotation performed on pixs.
+ *      (5) Use on text images with a resolution between 150 and 300 ppi.
  * </pre>
  */
 PIX *
@@ -304,27 +319,22 @@ PIX       *pix1;
         L_INFO("text orientation not determined; no rotation\n", __func__);
         if (protation) *protation = 0;
         return pixCopy(NULL, pixs);
-        break;
     case L_TEXT_ORIENT_UP:
         L_INFO("text is oriented up; no rotation\n", __func__);
         if (protation) *protation = 0;
         return pixCopy(NULL, pixs);
-        break;
     case L_TEXT_ORIENT_LEFT:
         L_INFO("landscape; text oriented left; 90 cw rotation\n", __func__);
         if (protation) *protation = 90;
         return pixRotateOrth(pixs, 1);
-        break;
     case L_TEXT_ORIENT_DOWN:
         L_INFO("text oriented down; 180 cw rotation\n", __func__);
         if (protation) *protation = 180;
         return pixRotateOrth(pixs, 2);
-        break;
     case L_TEXT_ORIENT_RIGHT:
         L_INFO("landscape; text oriented right; 270 cw rotation\n", __func__);
         if (protation) *protation = 270;
         return pixRotateOrth(pixs, 3);
-        break;
     default:
         L_ERROR("invalid orient flag!\n", __func__);
         return pixCopy(NULL, pixs);
@@ -338,7 +348,7 @@ PIX       *pix1;
 /*!
  * \brief   pixOrientDetect()
  *
- * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[in]    pixs       1 bpp, deskewed, Roman text, 150 - 300 ppi
  * \param[out]   pupconf    [optional] ; may be NULL
  * \param[out]   pleftconf  [optional] ; may be NULL
  * \param[in]    mincount   min number of up + down; use 0 for default
@@ -390,13 +400,14 @@ PIX       *pix1;
  *      (6) One should probably not interpret the direction unless
  *          there are a sufficient number of counts for both orientations,
  *          in which case neither upconf nor leftconf will be 0.0.
- *      (7) This algorithm will fail on some images, such as tables,
+ *      (7) Use on text images with a resolution between 150 and 300 ppi.
+ *      (8) This algorithm will fail on some images, such as tables,
  *          where most of the characters are numbers and appear as
  *          uppercase, but there are some repeated words that give a
  *          biased signal.  It may be advisable to run a table detector
  *          first (e.g., pixDecideIfTable()), and not run the orientation
  *          detector if it is a table.
- *      (8) Uses rasterop implementation of HMT.
+ *      (9) Uses rasterop implementation of HMT.
  * </pre>
  */
 l_ok
@@ -513,7 +524,7 @@ l_float32  absupconf, absleftconf;
 /*!
  * \brief   pixUpDownDetect()
  *
- * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[in]    pixs       1 bpp, deskewed, Roman text, 150 - 300 ppi
  * \param[out]   pconf      confidence that text is rightside-up
  * \param[in]    mincount   min number of up + down; use 0 for default
  * \param[in]    npixels    number of pixels removed from each side of word box
@@ -546,6 +557,7 @@ l_float32  absupconf, absleftconf;
  *          this function is designed to work for input pix between
  *          150 and 300 ppi, and an 8x reduction on a 150 ppi image
  *          is going too far -- components will get merged.
+ *      (5) Use on text images with a resolution between 150 and 300 ppi.
  * </pre>
  */
 l_ok
@@ -670,7 +682,7 @@ SEL       *sel1, *sel2, *sel3, *sel4;
 /*!
  * \brief   pixMirrorDetect()
  *
- * \param[in]    pixs       1 bpp, deskewed, English text
+ * \param[in]    pixs       1 bpp, deskewed, Roman text, 150 - 300 ppi
  * \param[out]   pconf      confidence that text is not LR mirror reversed
  * \param[in]    mincount   min number of left + right; use 0 for default
  * \param[in]    debug      1 for debug output; 0 otherwise
@@ -704,6 +716,7 @@ SEL       *sel1, *sel2, *sel3, *sel4;
  *          parts of the characters are purposely weakened sufficiently
  *          to allow these characters to remain open.  The wonders
  *          of morphology!
+ *      (5) Use on text images with a resolution between 150 and 300 ppi.
  * </pre>
  */
 l_ok

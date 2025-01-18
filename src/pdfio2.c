@@ -249,10 +249,10 @@ L_PDF_DATA   *lpd = NULL;
     h = cid->h;
     if (res <= 0.0)
         res = (pixres > 0) ? pixres : DefaultInputRes;
-    xpt = x * 72. / res;
-    ypt = y * 72. / res;
-    wpt = w * 72. / res;
-    hpt = h * 72. / res;
+    xpt = x * 72.f / res;
+    ypt = y * 72.f / res;
+    wpt = w * 72.f / res;
+    hpt = h * 72.f / res;
 
         /* Set up lpd */
     if (!plpd) {  /* single image */
@@ -959,7 +959,8 @@ FILE         *fp;
         data85 = encodeAscii85(data, nbytes, &nbytes85);
         LEPT_FREE(data);
         if (!data85)
-            return (L_COMP_DATA *)ERROR_PTR("data85 not made", __func__, NULL);
+            return (L_COMP_DATA *)ERROR_PTR_1("data85 not made",
+                                              fname, __func__, NULL);
         else
             data85[nbytes85 - 1] = '\0';  /* remove the newline */
     }
@@ -1156,7 +1157,8 @@ FILE         *fp;
         data85 = encodeAscii85(datacomp, nbytescomp, &nbytes85);
         LEPT_FREE(datacomp);
         if (!data85)
-            return (L_COMP_DATA *)ERROR_PTR("data85 not made", __func__, NULL);
+            return (L_COMP_DATA *)ERROR_PTR_1("data85 not made",
+                                              fname, __func__, NULL);
         else
             data85[nbytes85 - 1] = '\0';  /* remove the newline */
     }
@@ -1624,8 +1626,8 @@ L_PDF_DATA  *lpd = NULL;
     res = cid->res;
     if (res <= 0)
         res = DefaultInputRes;
-    wpt = cid->w * 72. / res;
-    hpt = cid->h * 72. / res;
+    wpt = cid->w * 72.f / res;
+    hpt = cid->h * 72.f / res;
 
         /* Set up the pdf data struct (lpd) */
     if ((lpd = pdfdataCreate(title)) == NULL)
@@ -2941,7 +2943,7 @@ getPdfRendererResolution(const char  *infile,
 {
 char      buf[256];
 char     *tail, *basename, *fname;
-l_int32   ret, res, resmax, medw, medh, medmax, npages, pageno, w, h;
+l_int32   ret, res, medw, medh, medmax, npages, pageno, w, h;
 SARRAY   *sa;
 
     if (!pres)
@@ -2956,7 +2958,7 @@ SARRAY   *sa;
 
     if (!LeptDebugOK) {
         L_INFO("Running pdftoppm is disabled; "
-               "use setLeptDebugOK(1) to enable\n",
+               "use setLeptDebugOK(1) to enable\n"
                "returns default resolution 300 ppi\n", __func__);
         return 1;
     }

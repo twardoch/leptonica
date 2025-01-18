@@ -720,7 +720,7 @@ pixGetBlackOrWhiteVal(PIX       *pixs,
                       l_int32    op,
                       l_uint32  *pval)
 {
-l_int32   d, val;
+l_int32   d, index;
 PIXCMAP  *cmap;
 
     if (!pval)
@@ -736,17 +736,17 @@ PIXCMAP  *cmap;
     if (!cmap) {
         if ((d == 1 && op == L_GET_WHITE_VAL) ||
             (d > 1 && op == L_GET_BLACK_VAL)) {  /* min val */
-            val = 0;
+            *pval = 0;
         } else {  /* max val */
-            val = (d == 32) ? 0xffffff00 : (1 << d) - 1;
+            *pval = (d == 32) ? 0xffffff00 : (1 << d) - 1;
         }
     } else {  /* handle colormap */
         if (op == L_GET_BLACK_VAL)
-            pixcmapAddBlackOrWhite(cmap, 0, &val);
+            pixcmapAddBlackOrWhite(cmap, 0, &index);
         else  /* L_GET_WHITE_VAL */
-            pixcmapAddBlackOrWhite(cmap, 1, &val);
+            pixcmapAddBlackOrWhite(cmap, 1, &index);
+        *pval = index;
     }
-    *pval = val;
 
     return 0;
 }
@@ -1164,7 +1164,8 @@ pixSetInRectArbitrary(PIX      *pix,
                       BOX      *box,
                       l_uint32  val)
 {
-l_int32    n, x, y, xstart, xend, ystart, yend, bw, bh, w, h, d, wpl, maxval;
+l_int32    n, x, y, xstart, xend, ystart, yend, bw, bh, w, h, d, wpl;
+l_uint32   maxval;
 l_uint32  *data, *line;
 BOX       *boxc;
 PIXCMAP   *cmap;
@@ -1465,9 +1466,9 @@ l_uint32  *data, *pword;
 /*!
  * \brief   pixSetOrClearBorder()
  *
- * \param[in]    pixs   all depths
- * \param[in]    left,  right, top, bot amount to set or clear
- * \param[in]    op     operation PIX_SET or PIX_CLR
+ * \param[in]    pixs                     all depths
+ * \param[in]    left, right, top, bot    border region amount to set or clear: these distances are from outside
+ * \param[in]    op                       operation PIX_SET or PIX_CLR
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1511,7 +1512,7 @@ l_int32  w, h;
  * \brief   pixSetBorderVal()
  *
  * \param[in]    pixs                   8, 16 or 32 bpp
- * \param[in]    left, right, top, bot  amount to set
+ * \param[in]    left, right, top, bot  border region amount to set: these distances are from outside
  * \param[in]    val                    value to set at each border pixel
  * \return  0 if OK; 1 on error
  *
@@ -1879,8 +1880,9 @@ pixAddBorderGeneral(PIX      *pixs,
                     l_int32   bot,
                     l_uint32  val)
 {
-l_int32  ws, hs, wd, hd, d, maxval, op;
-PIX     *pixd;
+l_int32   ws, hs, wd, hd, d, op;
+l_uint32  maxval;
+PIX      *pixd;
 
     if (!pixs)
         return (PIX *)ERROR_PTR("pixs not defined", __func__, NULL);
@@ -2196,7 +2198,7 @@ PIX     *pixd;
  *
  * <pre>
  * Notes:
- *      (1) This applies mirrored boundary conditions horizontally
+ *      (1) This applies mirrored boundary conditions (b.c.) horizontally
  *          and repeated b.c. vertically.
  *      (2) It is specifically used for avoiding special operations
  *          near boundaries when convolving a hue-saturation histogram
@@ -2374,7 +2376,7 @@ PIXCMAP   *cmap;
         pix1 = pixCopy(NULL, pixs);
 
         /* Scale if necessary so the output width is not larger than maxw */
-    scalefact = (maxw == 0) ? 1.0 : L_MIN(1.0, (l_float32)(maxw) / w);
+    scalefact = (maxw == 0) ? 1.0f : L_MIN(1.0f, (l_float32)(maxw) / w);
     width = (l_int32)(scalefact * w);
 
     pixa = pixaCreate(3);
@@ -2408,7 +2410,7 @@ PIXCMAP   *cmap;
  * Notes:
  *      (1) the 4th byte, sometimes called the "alpha channel",
  *          and which is often used for blending between different
- *          images, is left with 0 value.
+ *          images, is left with 0 value (fully opaque).
  *      (2) see Note (4) in pix.h for details on storage of
  *          8-bit samples within each 32-bit word.
  *      (3) This implementation, setting the r, g and b components
@@ -3529,8 +3531,8 @@ void
 l_setAlphaMaskBorder(l_float32  val1,
                      l_float32  val2)
 {
-    val1 = L_MAX(0.0, L_MIN(1.0, val1));
-    val2 = L_MAX(0.0, L_MIN(1.0, val2));
+    val1 = L_MAX(0.0f, L_MIN(1.0f, val1));
+    val2 = L_MAX(0.0f, L_MIN(1.0f, val2));
     AlphaMaskBorderVals[0] = val1;
     AlphaMaskBorderVals[1] = val2;
 }

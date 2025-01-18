@@ -812,7 +812,8 @@ l_int32  *array;
     if (!na)
         return (l_int32 *)ERROR_PTR("na not defined", __func__, NULL);
 
-    n = numaGetCount(na);
+    if ((n = numaGetCount(na)) == 0)
+        return (l_int32 *)ERROR_PTR("na is empty", __func__, NULL);
     if ((array = (l_int32 *)LEPT_CALLOC(n, sizeof(l_int32))) == NULL)
         return (l_int32 *)ERROR_PTR("array not made", __func__, NULL);
     for (i = 0; i < n; i++) {
@@ -859,7 +860,8 @@ l_float32  *array;
     if (copyflag == L_NOCOPY) {
         array = na->array;
     } else {  /* copyflag == L_COPY */
-        n = numaGetCount(na);
+        if ((n = numaGetCount(na)) == 0)
+            return (l_float32 *)ERROR_PTR("na is empty", __func__, NULL);
         if ((array = (l_float32 *)LEPT_CALLOC(n, sizeof(l_float32))) == NULL)
             return (l_float32 *)ERROR_PTR("array not made", __func__, NULL);
         for (i = 0; i < n; i++)
@@ -1271,7 +1273,7 @@ FILE    *fp;
     ret = numaWriteStream(fp, na);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32
@@ -1944,7 +1946,7 @@ FILE    *fp;
     ret = numaaWriteStream(fp, naa);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32

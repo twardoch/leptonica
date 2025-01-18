@@ -346,7 +346,7 @@ boxSetGeometry(BOX     *box,
  * \brief   boxGetSideLocations()
  *
  * \param[in]    box
- * \param[out]   pl, pt, pr, pb     [optional] each can be null
+ * \param[out]   pl, pr, pt, pb     [optional] each can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1954,7 +1954,7 @@ FILE    *fp;
     ret = boxaaWriteStream(fp, baa);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32
@@ -2235,7 +2235,7 @@ FILE    *fp;
     ret = boxaWriteStream(fp, boxa);
     fputc('\0', fp);
     fclose(fp);
-    *psize = *psize - 1;
+    if (*psize > 0) *psize = *psize - 1;
 #else
     L_INFO("no fmemopen API --> work-around: write to temp file\n", __func__);
   #ifdef _WIN32

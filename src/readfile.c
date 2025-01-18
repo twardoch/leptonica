@@ -392,7 +392,6 @@ PIXCMAP  *cmap;
     case IFF_UNKNOWN:
         return (PIX *)ERROR_PTR( "Unknown format: no pix returned",
                 __func__, NULL);
-        break;
     }
 
     if (pix) {
@@ -902,7 +901,6 @@ PIXCMAP  *cmap;
     case IFF_UNKNOWN:
         return (PIX *)ERROR_PTR("Unknown format: no pix returned",
                 __func__, NULL);
-        break;
     }
 
         /* Set the input format.  For tiff reading from memory we lose
@@ -1059,7 +1057,6 @@ PIX     *pix;
 
     case IFF_UNKNOWN:
         return ERROR_INT("unknown format; no data returned", __func__, 1);
-        break;
     }
 
     if (pw) *pw = w;
@@ -1126,19 +1123,19 @@ PIXCMAP  *cmap;
 
     findFileFormat(filename, &format);
     if (format == IFF_JP2) {
-        fpin = lept_fopen(filename, "rb");
+        fpin = fopenReadStream(filename);
         fgetJp2kResolution(fpin, &xres, &yres);
-        fclose(fpin);
+        if (fpin) fclose(fpin);
         fprintf(fpout, "  xres = %d, yres = %d\n", xres, yres);
     } else if (format == IFF_PNG) {
-        fpin = lept_fopen(filename, "rb");
+        fpin = fopenReadStream(filename);
         fgetPngResolution(fpin, &xres, &yres);
-        fclose(fpin);
+        if (fpin) fclose(fpin);
         fprintf(fpout, "  xres = %d, yres = %d\n", xres, yres);
         if (iscmap) {
-            fpin = lept_fopen(filename, "rb");
+            fpin = fopenReadStream(filename);
             fgetPngColormapInfo(fpin, &cmap, &transparency);
-            fclose(fpin);
+            if (fpin) fclose(fpin);
             if (transparency)
                 fprintf(fpout, "  colormap has transparency\n");
             else
@@ -1147,9 +1144,9 @@ PIXCMAP  *cmap;
             pixcmapDestroy(&cmap);
         }
     } else if (format == IFF_JFIF_JPEG) {
-        fpin = lept_fopen(filename, "rb");
+        fpin = fopenReadStream(filename);
         fgetJpegResolution(fpin, &xres, &yres);
-        fclose(fpin);
+        if (fpin) fclose(fpin);
         fprintf(fpout, "  xres = %d, yres = %d\n", xres, yres);
     }
 
@@ -1200,9 +1197,9 @@ PIXCMAP  *cmap;
     if (format == IFF_TIFF || format == IFF_TIFF_G4 ||
         format == IFF_TIFF_G3 || format == IFF_TIFF_PACKBITS) {
         fprintf(fpout, "  Tiff header information:\n");
-        fpin = lept_fopen(filename, "rb");
+        fpin = fopenReadStream(filename);
         tiffGetCount(fpin, &npages);
-        lept_fclose(fpin);
+        if (fpin) fclose(fpin);
         if (npages == 1)
             fprintf(fpout, "    One page in file\n");
         else
@@ -1223,7 +1220,7 @@ PIXCMAP  *cmap;
          * result when a white background is visible through the
          * transparency layer. */
     if (pixGetSpp(pix) == 4) {
-        pixt = pixDisplayLayersRGBA(pix, 0xffffff00, 600.0);
+        pixt = pixDisplayLayersRGBA(pix, 0xffffff00, 600);
         pixDisplay(pixt, 100, 100);
         pixDestroy(&pixt);
     }
@@ -1358,7 +1355,7 @@ PIXCMAP   *cmap;
 #endif  /* HAVE_LIBPNG */
 
         /* ----------------------- TIFF -------------------------- */
-#if HAVE_LIBTIFF
+#if HAVE_LIBTIFF && HAVE_LIBJPEG
         /* TIFF works for 1, 2, 4, 8, 16 and 32 bpp images.
          * Because 8 bpp tiff always writes 256 entry colormaps, the
          * colormap sizes may be different for 8 bpp images with
@@ -1478,7 +1475,7 @@ PIXCMAP   *cmap;
         }
         pixDestroy(&pix1);
     }
-#endif  /* HAVE_LIBTIFF */
+#endif  /* HAVE_LIBTIFF && HAVE_LIBJPEG */
 
         /* ----------------------- PNM -------------------------- */
 
